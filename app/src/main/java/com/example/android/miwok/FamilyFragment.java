@@ -1,27 +1,26 @@
 package com.example.android.miwok;
 
+
 import android.content.Context;
-import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.os.StrictMode;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class NumbersActivity extends AppCompatActivity {
-    //Handles playback of all the sound file
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class FamilyFragment extends Fragment {
+
     private MediaPlayer mMediaPlayer;
-    //Handles audio focus when playing a sound file
     private AudioManager mAudioManager;
     //This listener gets triggered when the {@link MediaPlayer} has completed playing the audio file
     AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
@@ -54,44 +53,34 @@ public class NumbersActivity extends AppCompatActivity {
         }
     };
 
+    public FamilyFragment() {
+        // Required empty public constructor
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_numbers);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.activity_family, container, false);
         //Create and setup the {@link AudioManager} to request audio focus
-        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         final ArrayList<Word> words = new ArrayList<>();
-        //String [] words = new String[10]; //words[0] = "one";
-        /*
-        for (int index=0; index<words.size(); index++) {
-            TextView wordView = new TextView(this);
-            wordView.setText(words.get(index));
-            rootView.addView(wordView);
-        }
-        */
-        words.add(new Word("one", "lutti", R.mipmap.number_one, R.raw.number_one));
-        words.add(new Word("two", "otiiko", R.mipmap.number_two, R.raw.number_two));
-        words.add(new Word("three", "tolookosu", R.mipmap.number_three, R.raw.number_three));
-        words.add(new Word("four", "oyyisa", R.mipmap.number_four, R.raw.number_four));
-        words.add(new Word("five", "massokka",R.mipmap.number_five, R.raw.number_five));
-        words.add(new Word("six", "temmokka", R.mipmap.number_six, R.raw.number_six));
-        words.add(new Word("seven", "kenekaku", R.mipmap.number_seven, R.raw.number_seven));
-        words.add(new Word("eight", "kawinta", R.mipmap.number_eight, R.raw.number_eight));
-        words.add(new Word("nine", "wo'e", R.mipmap.number_nine, R.raw.number_nine));
-        words.add(new Word("ten", "na'aacha", R.mipmap.number_ten, R.raw.number_ten));
-        //LinearLayout rootView = (LinearLayout)findViewById(R.id.rootView);
-        WordAdapter itemsAdapter = new WordAdapter(this, words, R.color.category_numbers);
-        //Spinner, ListView and GridView
-        //GridView add android:numColumns="2" in activity_number.xml
-        ListView listView = (ListView) findViewById(R.id.list_numbers);
+        words.add(new Word("father", "әpә", R.mipmap.family_father, R.raw.family_father));
+        words.add(new Word("mother", "әṭa" , R.mipmap.family_mother, R.raw.family_mother));
+        words.add(new Word("son", "angsi", R.mipmap.family_son, R.raw.family_son));
+        words.add(new Word("daughter", "tune", R.mipmap.family_daughter, R.raw.family_daughter));
+        words.add(new Word("older brother", "taachi", R.mipmap.family_older_brother, R.raw.family_older_brother));
+        words.add(new Word("younger brother", "chalitti", R.mipmap.family_younger_brother, R.raw.family_younger_brother));
+        words.add(new Word("older sister", "teṭe", R.mipmap.family_older_sister, R.raw.family_older_sister));
+        words.add(new Word("younger sister", "kolliti", R.mipmap.family_younger_sister, R.raw.family_younger_sister));
+        words.add(new Word("grandmother ", "ama", R.mipmap.family_grandfather, R.raw.family_grandmother));
+        words.add(new Word("grandfather", "paapa", R.mipmap.family_grandfather, R.raw.family_grandfather));
+        WordAdapter itemsAdapter = new WordAdapter(getActivity(), words, R.color.category_family);
+        ListView listView = (ListView) rootView.findViewById(R.id.list_family);
         listView.setAdapter(itemsAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Get the {@link Word} object at the given position the user clicked on
                 Word word = words.get(position);
-                //Release the media player if it currently exists because we are about to play a
-                //different sound file
                 releaseMediaPlayer();
                 //Request audio focus for playback
                 int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener,
@@ -104,7 +93,7 @@ public class NumbersActivity extends AppCompatActivity {
                     //We have audio focus now
                     //Create and setup the {@link MediaPlayer} for the audio resource associated with
                     //the current word
-                    mMediaPlayer = MediaPlayer.create(NumbersActivity.this, word.getmAudioResourceID());
+                    mMediaPlayer = MediaPlayer.create(getActivity(), word.getmAudioResourceID());
                     //Start the audio file
                     mMediaPlayer.start();
                     //Setup a listener on the media player, so that we can stop and release the media
@@ -113,12 +102,15 @@ public class NumbersActivity extends AppCompatActivity {
                 }
             }
         });
+        return rootView;
     }
+
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         releaseMediaPlayer();
     }
+
     private void releaseMediaPlayer(){
         // If the media player is not null, then it may be currently playing a sound.
         if (mMediaPlayer != null) {
@@ -134,4 +126,5 @@ public class NumbersActivity extends AppCompatActivity {
             mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
         }
     }
+
 }

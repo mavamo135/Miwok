@@ -1,19 +1,26 @@
 package com.example.android.miwok;
 
+
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class FamilyActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class ColorsFragment extends Fragment {
 
     private MediaPlayer mMediaPlayer;
+    //Handles audio focus when playing a sound file
     private AudioManager mAudioManager;
     //This listener gets triggered when the {@link MediaPlayer} has completed playing the audio file
     AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
@@ -46,32 +53,36 @@ public class FamilyActivity extends AppCompatActivity {
         }
     };
 
+    public ColorsFragment() {
+        // Required empty public constructor
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_family);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.activity_colors, container, false);
         //Create and setup the {@link AudioManager} to request audio focus
-        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         final ArrayList<Word> words = new ArrayList<>();
-        words.add(new Word("father", "әpә", R.mipmap.family_father, R.raw.family_father));
-        words.add(new Word("mother", "әṭa" , R.mipmap.family_mother, R.raw.family_mother));
-        words.add(new Word("son", "angsi", R.mipmap.family_son, R.raw.family_son));
-        words.add(new Word("daughter", "tune", R.mipmap.family_daughter, R.raw.family_daughter));
-        words.add(new Word("older brother", "taachi", R.mipmap.family_older_brother, R.raw.family_older_brother));
-        words.add(new Word("younger brother", "chalitti", R.mipmap.family_younger_brother, R.raw.family_younger_brother));
-        words.add(new Word("older sister", "teṭe", R.mipmap.family_older_sister, R.raw.family_older_sister));
-        words.add(new Word("younger sister", "kolliti", R.mipmap.family_younger_sister, R.raw.family_younger_sister));
-        words.add(new Word("grandmother ", "ama", R.mipmap.family_grandfather, R.raw.family_grandmother));
-        words.add(new Word("grandfather", "paapa", R.mipmap.family_grandfather, R.raw.family_grandfather));
-        WordAdapter itemsAdapter = new WordAdapter(this, words, R.color.category_family);
-        ListView listView = (ListView) findViewById(R.id.list_family);
+        words.add(new Word("red", "weṭeṭṭi", R.mipmap.color_red, R.raw.color_red));
+        words.add(new Word("green", "chokokki", R.mipmap.color_green, R.raw.color_green));
+        words.add(new Word("brown", "ṭakaakki", R.mipmap.color_brown, R.raw.color_brown));
+        words.add(new Word("gray", "ṭopoppi", R.mipmap.color_gray, R.raw.color_gray));
+        words.add(new Word("black", "kululli", R.mipmap.color_black, R.raw.color_black));
+        words.add(new Word("white", "kelelli", R.mipmap.color_white, R.raw.color_white));
+        words.add(new Word("dusty yellow", "ṭopiisә", R.mipmap.color_dusty_yellow, R.raw.color_dusty_yellow));
+        words.add(new Word("mustard yellow", "chiwiiṭә", R.mipmap.color_mustard_yellow, R.raw.color_mustard_yellow));
+        WordAdapter itemsAdapter = new WordAdapter(getActivity(), words, R.color.category_colors);
+        ListView listView = (ListView) rootView.findViewById(R.id.list_colors);
         listView.setAdapter(itemsAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Word word = words.get(position);
+                //Release the media player if it currently exists because we are about to play a
+                //different sound file
                 releaseMediaPlayer();
-                mMediaPlayer = MediaPlayer.create(FamilyActivity.this, word.getmAudioResourceID());
+                //Log.v("NumbersActivity", "Current word: " + word);
                 //Request audio focus for playback
                 int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener,
                         //Use the music stream
@@ -83,7 +94,7 @@ public class FamilyActivity extends AppCompatActivity {
                     //We have audio focus now
                     //Create and setup the {@link MediaPlayer} for the audio resource associated with
                     //the current word
-                    mMediaPlayer = MediaPlayer.create(FamilyActivity.this, word.getmAudioResourceID());
+                    mMediaPlayer = MediaPlayer.create(getActivity(), word.getmAudioResourceID());
                     //Start the audio file
                     mMediaPlayer.start();
                     //Setup a listener on the media player, so that we can stop and release the media
@@ -92,9 +103,11 @@ public class FamilyActivity extends AppCompatActivity {
                 }
             }
         });
+        return rootView;
     }
+
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         releaseMediaPlayer();
     }
